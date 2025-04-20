@@ -1,10 +1,10 @@
-package com.project.airbnbapp;
+package com.project;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AirbnbappApplicationTests {
+class AirbnbAppApplicationTests {
 
 	@Test
 	void contextLoads() {
