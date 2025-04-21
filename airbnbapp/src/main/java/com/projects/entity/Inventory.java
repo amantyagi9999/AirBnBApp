@@ -1,47 +1,53 @@
-package com.project.entity;
+package com.projects.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
+@Table(
+        uniqueConstraints = @UniqueConstraint(
+            name = "unique_hotel_room_date",
+            columnNames = {"hotel_id", "room_id", "date"}
+))
+@Builder
 @NoArgsConstructor
-@Builder@Table(name = "inventory", uniqueConstraints = @UniqueConstraint(name= "unique_hotel_room_date",
-        columnNames = {"hotel_id", "room_id", "date"}))
+@AllArgsConstructor
 public class Inventory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
     private Hotel hotel;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name= "room_id", nullable = false)
     private Room room;
 
     @Column(nullable = false)
     private LocalDate date;
 
-    private Integer totalCount;
-
     @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     private Integer bookedCount;
 
-    @Column(nullable = false, precision = 5)
-    private Double surgeFactor;
+    @Column(nullable = false)
+    private Integer totalCount;
 
-    @Column(nullable = false, precision = 10)
-    private Double price;
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal surgeFactor;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price; // basePrice * surgeFactor
 
     @Column(nullable = false)
     private String city;
@@ -50,7 +56,6 @@ public class Inventory {
     private Boolean closed;
 
     @CreationTimestamp
-    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

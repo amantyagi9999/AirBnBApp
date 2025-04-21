@@ -1,7 +1,8 @@
-package com.project.entity;
+package com.projects.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,34 +12,31 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@Table(name = "room")
 public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
     private Hotel hotel;
 
-    private String name;
-
+    @Column(nullable = false)
     private String type;
 
-    private Integer totalCount;
-
-    private Integer capacity;
-
-    @Column(nullable = false, precision = 10)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal basePrice;
 
-    private String[] photos;
+    private String photos;
 
-    private String[] ameneties;
+    private String amenities;
+
+    @Column(nullable = false)
+    private Integer totalCount;
+
+    @Column(nullable = false)
+    private Integer capacity;
 
     @CreationTimestamp
     @Column(updatable = false)

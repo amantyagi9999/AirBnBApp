@@ -1,42 +1,37 @@
-package com.project.entity;
+package com.projects.entity;
 
-import com.project.entity.enums.Role;
+import com.projects.entity.enums.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@Table(name = "user")
-public class User {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Column(unique = true, nullable = false)
+    private String transactionId;
 
-    private String email;
-
-    private String password;
-
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount;
 
     @CreationTimestamp
-    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
 }

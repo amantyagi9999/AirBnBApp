@@ -1,4 +1,4 @@
-package com.project.entity.enums;
+package com.projects.entity.enums;
 
 public enum Gender {
     MALE,
