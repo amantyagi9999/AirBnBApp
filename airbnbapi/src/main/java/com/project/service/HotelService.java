@@ -1,6 +1,7 @@
 package com.project.service;
 
 import com.project.dto.HotelDto;
+import com.project.dto.HotelInfoDto;
 
 public interface HotelService {
     HotelDto createNewHotel(HotelDto hotelDto);
@@ -13,4 +14,5 @@ public interface HotelService {
 
     void activateHotel(Long hotelId);
 
+    HotelInfoDto getHotelInfo(Long hotelId);
 }

@@ -1,6 +1,7 @@
 package com.project.controller;
 
 import com.project.dto.HotelDto;
+import com.project.dto.HotelInfoDto;
 import com.project.service.HotelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,5 +46,11 @@ public class HotelController {
     public ResponseEntity<Void> activateHotel(@PathVariable Long hotelId) {
         hotelService.activateHotel(hotelId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{hotelId}/info")
+    public ResponseEntity<HotelInfoDto> getHotelInfo(@PathVariable Long hotelId) {
+        HotelInfoDto  hotelInfoDto = hotelService.getHotelInfo(hotelId);
+        return ResponseEntity.ok(hotelInfoDto);
     }
 }

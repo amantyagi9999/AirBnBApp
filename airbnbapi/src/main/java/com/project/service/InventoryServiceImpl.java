@@ -1,14 +1,22 @@
 package com.project.service;
 
+import com.project.dto.HotelDto;
+import com.project.dto.HotelSearchDto;
+import com.project.entity.Hotel;
 import com.project.entity.Inventory;
 import com.project.entity.Room;
 import com.project.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +24,7 @@ import java.time.LocalDate;
 public class InventoryServiceImpl implements InventoryService{
 
     private final InventoryRepository inventoryRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public void initializeRoomForAYear(Room room) {
@@ -38,8 +47,18 @@ public class InventoryServiceImpl implements InventoryService{
     }
 
     @Override
-    public void deleteFutureInventories(Room room) {
+    public void deleteAllInventories(Room room) {
         LocalDate today = LocalDate.now();
-        inventoryRepository.deleteByDateAfterAndRoom(today, room);
+        inventoryRepository.deleteByRoom(room);
+    }
+
+    @Override
+    public Page<HotelDto> searchHotel(HotelSearchDto hotelSearchDto) {
+        Pageable pageable = PageRequest.of(hotelSearchDto.getPage(), hotelSearchDto.getSize());
+        long dateCount = ChronoUnit.DAYS.between(hotelSearchDto.getCheckInDate(), hotelSearchDto.getCheckOutDate())+1;
+        Page<Hotel> pageHotel = inventoryRepository.findHotelWithAvailabileInventory(hotelSearchDto.getCity(), hotelSearchDto.getCheckInDate(),
+                                                                hotelSearchDto.getCheckOutDate(), hotelSearchDto.getRoomsCount(),dateCount, pageable);
+
+        return pageHotel.map((element) -> modelMapper.map(element, HotelDto.class));
     }
 }

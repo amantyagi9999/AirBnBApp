@@ -1,15 +1,20 @@
 package com.project.service;
 
 import com.project.dto.HotelDto;
+import com.project.dto.HotelInfoDto;
+import com.project.dto.RoomDto;
 import com.project.entity.Hotel;
 import com.project.entity.Room;
 import com.project.exception.ResourceNotFoundException;
 import com.project.repository.HotelRepository;
+import com.project.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -19,6 +24,7 @@ public class HotelServiceImpl implements HotelService{
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
     private final InventoryService inventoryService;
+    private final RoomRepository roomRepository;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto) {
@@ -58,10 +64,11 @@ public class HotelServiceImpl implements HotelService{
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+id));
 
-        hotelRepository.deleteById(id);
         for(Room room: hotel.getRooms()) {
-            inventoryService.deleteFutureInventories(room);
+            inventoryService.deleteAllInventories(room);
+            roomRepository.deleteById(room.getId());
         }
+        hotelRepository.deleteById(id);
     }
 
     @Override
@@ -78,6 +85,13 @@ public class HotelServiceImpl implements HotelService{
         for(Room room: hotel.getRooms()) {
             inventoryService.initializeRoomForAYear(room);
         }
+    }
+
+    @Override
+    public HotelInfoDto getHotelInfo(Long hotelId) {
+       Hotel hotel =  hotelRepository.findById(hotelId).orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
+       List<RoomDto> roomDtoList = hotel.getRooms().stream().map(room -> modelMapper.map(room, RoomDto.class)).toList();
+       return new HotelInfoDto(modelMapper.map(hotel, HotelDto.class), roomDtoList);
     }
 
 
