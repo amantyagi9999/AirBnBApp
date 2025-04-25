@@ -4,6 +4,8 @@ import com.project.dto.BookingDto;
 import com.project.dto.BookingRequest;
 import com.project.dto.GuestDto;
 import com.project.service.HotelBookingService;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,12 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/bookings")
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT"
+)
 public class HotelBookingController {
 
     private final HotelBookingService hotelBookingService;

@@ -6,14 +6,17 @@ import com.project.dto.GuestDto;
 import com.project.entity.*;
 import com.project.entity.enums.BookingStatus;
 import com.project.exception.ResourceNotFoundException;
+import com.project.exception.UnAuthorizedAccessException;
 import com.project.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,7 @@ public class HotelBookingServiceImpl implements  HotelBookingService {
         }
         inventoryRepository.saveAll(inventoryList);
 
+
         User user = new User();
         user.setId(1L);  // ToDo Dummy user
 
@@ -61,7 +65,7 @@ public class HotelBookingServiceImpl implements  HotelBookingService {
                 .checkInDate(bookingRequest.getCheckInDate())
                 .checkOutDate(bookingRequest.getCheckOutDate())
                 .roomsCount(bookingRequest.getRoomsCount())
-                .user(user)
+                .user(getCurrentUser())
                 .amount(BigDecimal.TEN)
                 .build();
 
@@ -73,7 +77,16 @@ public class HotelBookingServiceImpl implements  HotelBookingService {
     @Transactional
     public BookingDto addGuestsToBooking(Long bookingId, List<GuestDto> guestDtoList) {
 
-        Booking booking = hotelBookingRepository.findById(bookingId).orElseThrow(()-> new ResourceNotFoundException("Booking not found with id {}"+bookingId));
+        Booking booking = hotelBookingRepository.findById(bookingId)
+                .orElseThrow(()-> new ResourceNotFoundException("Booking not found with id {}"+bookingId));
+
+        User user = getCurrentUser();
+        if(!user.equals(booking.getUser()))
+            throw new UnAuthorizedAccessException("You are not allowed to add guest to this booking"+ user.getId() + user.getEmail());
+
+        if(hasBookingExpired(booking))
+            throw new IllegalStateException("Booking has been expired");
+
         if(booking.getBookingStatus() != BookingStatus.RESERVED)
             throw new IllegalStateException("Booking is not in RESERVED state, guest can not be added");
 
@@ -91,9 +104,11 @@ public class HotelBookingServiceImpl implements  HotelBookingService {
 
     }
 
+    public boolean hasBookingExpired(Booking booking){
+        return booking.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now());
+    }
+
     public User getCurrentUser(){
-        User u = new User();
-        u.setId(1L); // ToDo DUMMY USER
-        return u;
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

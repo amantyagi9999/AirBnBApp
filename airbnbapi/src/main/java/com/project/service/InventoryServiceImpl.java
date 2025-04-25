@@ -1,10 +1,12 @@
 package com.project.service;
 
 import com.project.dto.HotelDto;
+import com.project.dto.HotelPriceDto;
 import com.project.dto.HotelSearchDto;
 import com.project.entity.Hotel;
 import com.project.entity.Inventory;
 import com.project.entity.Room;
+import com.project.repository.HotelMinPriceRepository;
 import com.project.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import java.time.temporal.ChronoUnit;
 public class InventoryServiceImpl implements InventoryService{
 
     private final InventoryRepository inventoryRepository;
+    private final HotelMinPriceRepository hotelMinPriceRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -53,12 +56,12 @@ public class InventoryServiceImpl implements InventoryService{
     }
 
     @Override
-    public Page<HotelDto> searchHotel(HotelSearchDto hotelSearchDto) {
+    public Page<HotelPriceDto> searchHotel(HotelSearchDto hotelSearchDto) {
         Pageable pageable = PageRequest.of(hotelSearchDto.getPage(), hotelSearchDto.getSize());
         long dateCount = ChronoUnit.DAYS.between(hotelSearchDto.getCheckInDate(), hotelSearchDto.getCheckOutDate())+1;
-        Page<Hotel> pageHotel = inventoryRepository.findHotelWithAvailabileInventory(hotelSearchDto.getCity(), hotelSearchDto.getCheckInDate(),
+        Page<HotelPriceDto> pageHotel = hotelMinPriceRepository.findHotelWithAvailabileInventory(hotelSearchDto.getCity(), hotelSearchDto.getCheckInDate(),
                                                                 hotelSearchDto.getCheckOutDate(), hotelSearchDto.getRoomsCount(),dateCount, pageable);
 
-        return pageHotel.map((element) -> modelMapper.map(element, HotelDto.class));
+        return pageHotel.map((element) -> modelMapper.map(element, HotelPriceDto.class));
     }
 }

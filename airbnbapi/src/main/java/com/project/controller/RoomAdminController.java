@@ -2,6 +2,8 @@ package com.project.controller;
 
 import com.project.dto.RoomDto;
 import com.project.service.RoomService;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/hotels/{hotelId}/rooms")
 @RequiredArgsConstructor
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT"
+)
 public class RoomAdminController {
 
     private final RoomService roomService;

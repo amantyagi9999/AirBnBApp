@@ -3,6 +3,8 @@ package com.project.controller;
 import com.project.dto.HotelDto;
 import com.project.dto.HotelInfoDto;
 import com.project.service.HotelService;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/hotels")
 @RequiredArgsConstructor
 @Slf4j
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT"
+)
 public class HotelController {
 
     private final HotelService hotelService;

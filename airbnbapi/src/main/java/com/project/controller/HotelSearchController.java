@@ -2,6 +2,7 @@ package com.project.controller;
 
 import com.project.dto.HotelDto;
 import com.project.dto.HotelInfoDto;
+import com.project.dto.HotelPriceDto;
 import com.project.dto.HotelSearchDto;
 import com.project.service.HotelService;
 import com.project.service.InventoryService;
@@ -22,9 +23,9 @@ public class HotelSearchController {
     private final HotelService hotelService;
 
     @PostMapping("/search")
-    public ResponseEntity<Page<HotelDto>> searchHotel(@RequestBody HotelSearchDto hotelSearchDto){
+    public ResponseEntity<Page<HotelPriceDto>> searchHotel(@RequestBody HotelSearchDto hotelSearchDto){
         log.info("Search hotel with "+ hotelSearchDto.getCity() + " " + hotelSearchDto.getCheckInDate() + " " + hotelSearchDto.getCheckOutDate() + " " + hotelSearchDto.getRoomsCount());
-        Page<HotelDto> page = inventoryService.searchHotel(hotelSearchDto);
+        Page<HotelPriceDto> page = inventoryService.searchHotel(hotelSearchDto);
         return ResponseEntity.ok(page);
     }
 
